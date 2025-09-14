@@ -2,10 +2,14 @@
 class nanoLib {
     public function GET($type, $param1, $param2 = "") {
         require "../incl/lib/connection.php";
-        if(!is_numeric($type)) $type = strtolower($type);
-        if(!is_numeric($param1)) $param1 = strtolower($param1);
-        if(!is_numeric($param2)) $param2 = strtolower($param2);
-        
+        function checkthenlower($var) {
+            if(!is_numeric($var)) $e = strtolower($var);
+            return $e;
+            }
+        $array = array($type, $param1, $param2);
+        foreach($array as $v) {
+        $v = checkthenlower($v);
+        }
         
         if(empty($type)) {
             $output = "ERROR 1: Parameters are empty.";
@@ -171,8 +175,14 @@ class nanoLib {
                     $dbh = "SELECT * FROM $param1";
                     $query = $db->prepare($dbh);
                     $query->execute();
-                    $output = $query->fetch();
+                    $output = $query->fetchAll();
                     }
+                break;
+                case 'variable':
+                    $query = $db->prepare("SELECT varValue FROM seafuncvars WHERE varName = :varName");
+                    $query->execute([':varName' => $param1]);
+                    $output = $query->fetchColumn();
+                    if($query->rowCount() === 0) $output = "ERROR 4: Not found"; 
                 break;
                 default:
                 $output = "ERROR 4: Type is invalid";
@@ -377,7 +387,7 @@ class nanoLib {
         require "../incl/lib/connection.php";
         switch($type) {
             case "level":
-                $query = $db->prepare("SELECT * FROM levels ORDER BY RAND() LIMIT 1;");
+                $query = $db->prepare("SELECT * FROM levels ORDER BY RAND() LIMIT 1");
                 $query->execute();
                 $result = $query->fetch();
 if($onlyDisplayLevelID === 1) {

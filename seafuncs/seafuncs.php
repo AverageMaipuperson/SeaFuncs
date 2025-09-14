@@ -129,10 +129,14 @@ body {
     font-family: "Cascadia Code", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
+  overflow-wrap: break-word;
+  overflow: auto;
     }
     
 .output2 {
     color: red;
+    overflow-wrap: break-word;
+    overflow: auto;
     }
 <?php
 include "settings/config.php";
@@ -458,6 +462,8 @@ var mapObj = {
    EXISTS:"<span class='get'>EXISTS</span>",
    DELETE:"<span class='get'>DELETE</span>",
    DOWNLOAD:"<span class='get'>DOWNLOAD</span>",
+   AS:"<span class='get'>AS</span>",
+   RAND:"<span class='get'>RAND</span>",
    levelid:"<span class='color2'>levelid</span>",
    levelname:"<span class='color2'>levelname</span>",
    accountid:"<span class='color2'>accountid</span>",
@@ -469,12 +475,15 @@ var mapObj = {
    accountid:"<span class='color2'>accountid</span>",
    unrate:"<span class='color2'>unrate</span>",
    level:"<span class='color2'>level</span>",
+   levels:"<span class='color2'>levels</span>",
    commentid:"<span class='color2'>commentid</span>",
    comment:"<span class='color2'>comment</span>",
    stats:"<span class='color2'>stats</span>",
    coins:"<span class='color2'>coins</span>",
    username:"<span class='color2'>username</span>",
    accountname:"<span class='color2'>accountname</span>",
+   variable:"<span class='color2'>variable</span>",
+   data:"<span class='color2'>data</span>"
 };
 
 var re = new RegExp(Object.keys(mapObj).join("|"),"gi"); 
@@ -537,6 +546,7 @@ let colorDiv;
 let hex;
 let xposition;
 let yposition;
+let includes;
 
 function isValidHexColor(colorString) {
   const hexColorRegex = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
@@ -563,8 +573,14 @@ let myStupidArray =
     'GET comment'
   ];
 
+let includeArray = [
+  'JOIN',
+  'AS'
+];
+
 // i suck at javascript dont mind this :3
-if(element && !myStupidArray.includes(b) && !b.includes("JOIN")) {
+includes = includeArray.some(element => b.includes(element));
+if(element && !myStupidArray.includes(b) && !includes) {
 document.body.removeChild(getDiv);
 paused = false;
 function sleep(ms) {
@@ -579,7 +595,7 @@ function sleep(ms) {
 if(paused === true) {
     return;
     }
-if(myStupidArray.includes(b) || b.includes("JOIN")) {
+if(myStupidArray.includes(b) || includes) {
 getDiv = document.createElement("div");
 getDiv.style.width = "100px";
 getDiv.style.height = "25px";
@@ -598,6 +614,9 @@ console.log(getDiv.id);
 
 if(b.includes("JOIN")) {
 getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">JOIN</p>";
+    }
+  if(b.includes("AS")) {
+getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">AS</p>";
     }
 switch (b) {
     case 'GET':
@@ -853,7 +872,7 @@ if(event.key === "Tab") {
 </script>
 
 <?php
-
+ini_set('display_errors', '0');
 include __DIR__ . "/lib/nanoLib.php";
 include "../incl/lib/connection.php";
 $nl = new nanoLib();
@@ -861,9 +880,10 @@ if(!empty($_COOKIE['text'])) {
     try {
 $result = explode(" ", $_COOKIE['text']);
 
-if(count($result) > 2 && str_contains($_COOKIE['text'], 'GET') && $result[2] !== 'JOIN' && !str_contains($_COOKIE['text'], "AS")) {
+if(count($result) > 2 && str_contains($_COOKIE['text'], 'GET') && $result[2] !== 'JOIN') {
 $x = 0;
 foreach($result as $value) {
+if($result[$x] === "AS") break;
 if ($x < 3) {
     $x++;
     } else {
@@ -921,58 +941,41 @@ if(!is_numeric($result[2]) && !empty($result[2])) $result[2] = "\"$result[2]\"";
 $result = array_filter($result);
 
 switch(count($result)) {
-    case 1:
-eval('$output = $nl->'.$result[0].'('.$result[1].');');
     case 2:
+eval('$output = $nl->'.$result[0].'('.$result[1].');');
+break;
+    case 3:
+eval('$output = $nl->'.$result[0].'('.$result[1].', '.$result[2].');');
+break;
+      default:
 eval('$output = $nl->'.$result[0].'('.$result[1].', '.$result[2].');');
 }
 
 if(str_contains($_COOKIE['text'], "AS")) {
-    
-    $query = $db->prepare("
-    SELECT COUNT(*)
-FROM information_schema.TABLES
-
-WHERE TABLE_SCHEMA = (SELECT table_schema
-FROM information_schema.tables
-WHERE table_name = 'levels')
-
-AND TABLE_NAME = 'seafuncvars'
-    ");
-    $query->execute();
-    $tableExists = $query->fetch();
-    
-    if($tableExists) {
-    $query = $db->prepare("
-    CREATE TABLE IF NOT EXISTS seafuncvars (
-    varID INT NOT NULL AUTO_INCREMENT,
-    varName VARCHAR(255) NOT NULL,
-    varValue VARCHAR(255) NOT NULL,
-    PRIMARY KEY (varID)
-    );
-    ");
-    $query->execute();
-    }
-    
+  if(empty($output)) $output = "ERROR 5: Function could not be found or there was no output.";
+    else {
     $lastIndex = end(explode(" ", $_COOKIE['text']));
     $query = $db->prepare("REPLACE INTO seafuncvars SET
     varName = :lastIndex, 
     varValue = :output");
     $query->execute([':lastIndex' => $lastIndex, ':output' => $output]);
     $output = "inserted into database, $output";
-    
     }
+  }
 
 } catch(Exception $e) {
 $output = $e;
 } finally {
 if(empty($output) OR !isset($output)) $output = "ERROR 5: Function could not be found or there was no output.";
 // if(empty($result[0]) OR empty($result[1])) $output = "ERROR 1: No sufficient parameters were given.";
-if(str_contains($output, 'ERROR') OR str_contains($output, 'PDO')) {
-print_r($result);
-print_r($oldresult);
-print_r($oldoutput);
+if(is_array($output)) {
+  echo '
+<div class="output">
+<p><b>Output:</b></p><p>';
 print_r($output);
+echo '</p>
+</div>';
+} elseif(str_contains($output, 'ERROR') OR str_contains($output, 'PDO')) {
 echo '
 <div class="output">
 <p><b>Output:</b></p><p class="output2"> '.$output.'</p>

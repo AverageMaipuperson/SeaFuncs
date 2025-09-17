@@ -1,31 +1,4 @@
-<?php 
-$filePath = __DIR__ . '/README.md'; 
-
-if (file_exists($filePath) && $_COOKIE['text'] === 'DOWNLOAD README') {
-
-    $output = "Operation done";
-     echo '<div class="output">
-<p><b>Output:</b></p><p class="output2"> '.$output.'</p>
-</div>';
-
-    header('Content-Description: File Transfer');
-    header('Content-Type: text/markdown'); 
-    header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
-    header('Content-Length: ' . filesize($filePath));
-    readfile($filePath);
-
-    ob_clean();
-    flush();
-    echo file_get_contents($filePath);
-    exit();
-} elseif(!file_exists($filePath) && $_COOKIE['text'] === 'DOWNLOAD README') {
-    $output = "Error: File not found.";
-}
-
-session_start();?>
+<?php session_start();?>
 <!DOCTYPE html>
 <header>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -509,7 +482,7 @@ const handleKey = (ev, elText, elPre) => {
 
     console.log(message);
     document.cookie = "text=" + message + "; expires=Thu, 18 Dec 2025 12:00:00 UTC; path=/";
-    window.location.href = "https://seagdps.5v.pl/seafuncs/seafuncs.php";
+    window.location.href = "seafuncs.php";
 
     elText.innerHTML = "";
     elPre.innerHTML = "";
@@ -872,9 +845,8 @@ if(event.key === "Tab") {
 </script>
 
 <?php
-ini_set('display_errors', '0');
-include __DIR__ . "/lib/nanoLib.php";
-include "../incl/lib/connection.php";
+require __DIR__ . "/lib/nanoLib.php";
+require "../incl/lib/connection.php";
 $nl = new nanoLib();
 if(!empty($_COOKIE['text'])) {
     try {

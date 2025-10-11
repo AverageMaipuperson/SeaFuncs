@@ -1,21 +1,130 @@
+<?php session_start();?>
 <?php
 class nanoLib {
-    public function GET($type, $param1, $param2 = "") {
-        require "../incl/lib/connection.php";
-        function checkthenlower($var) {
+
+    public function rgb_valid(int $red, int $green, int $blue): bool
+{
+    if ($red < 0 || $red > 255) {
+        return false;
+    }
+
+    if ($green < 0 || $green > 255) {
+        return false;
+    }
+
+    if ($blue < 0 || $blue > 255) {
+        return false;
+    }
+
+    return true;
+}
+    public function checkthenlower($var) {
             if(!is_numeric($var)) $e = strtolower($var);
             return $e;
             }
-        $array = array($type, $param1, $param2);
+    public function GET($type, $param1, $param2 = "") {
+        require "../incl/lib/connection.php";
+        $array = [$type, $param1, $param2];
         foreach($array as $v) {
-        $v = checkthenlower($v);
+        $v = $this->checkthenlower($v);
         }
         
         if(empty($type)) {
             $output = "ERROR 1: Parameters are empty.";
-            } else {
+            } else {   
         
         switch ($type) {
+            case 'levels': 
+             if(empty($param1)) {
+                    $output = "ERROR 1: Parameters are empty";
+                } else {
+
+                    $data = match($param1) {
+                        'levelid' => 'levelID',
+                        'levelname' => 'levelName',
+                        'username' => 'userName',
+                        default => 'levelID',
+
+                    };
+
+                switch($param2) {
+                    case 'unrated':
+                    $condition = "starDifficulty = 0 OR starStars = 0";
+                    break;
+                    case 'rated':
+                    $condition = " starStars > 0";
+                    break;
+                    case 'feature':
+                    case 'featured':
+                    $condition = " starFeatured > 0";
+                    break;
+                    case 'epic':
+                    $condition = "starEpic > 0 OR starHall > 0";
+                    break;
+                    case 'auto':
+                    $condition = " starStars = 1 OR starAuto = 1";
+                    break;
+                    case 'easy':
+                    $condition = " starDifficulty = 10";
+                    break;
+                    case 'normal':
+                    $condition = " starDifficulty = 20";
+                    break;
+                    case 'hard':
+                    $condition = " starDifficulty = 30";
+                    break;
+                    case 'harder':
+                    $condition = " starDifficulty = 40";
+                    break;
+                    case 'insane':
+                    $condition = " starDifficulty = 50 AND starDemon = 0";
+                    break;
+                    case 'demon':
+                    $condition = " starDemon > 0";
+                    break;
+                    case 'tiny':
+                    $condition = "levelLength = 0";
+                    break;
+                     case 'short':
+                    $condition = "levelLength = 1";
+                    break;
+                     case 'medium':
+                    $condition = "levelLength = 2";
+                    break;
+                     case 'long':
+                    $condition = "levelLength = 3";
+                    break;
+                     case 'xl':
+                    $condition = "levelLength > 3";
+                    break;
+                     case '2p':
+                    case 'twoplayer':
+                    case '2player':
+                    $condition = "twoPlayer > 0";
+                    break;
+                     case 'coins':
+                    case 'withcoins':
+                    $condition = "coins > 0";
+                    break;
+                     case 'verifiedcoins':
+                    case 'starcoins':
+                    $condition = "starCoins > 0";
+                    break;
+                    default:
+                    $condition = "1";
+                }
+                
+                $f = "SELECT $data FROM levels WHERE $condition";
+                echo $f;
+                    $query = $db->prepare($f);
+                    $query->execute();
+                    if($query->rowCount() == 0) {
+                        $output = "ERROR 2: Not found";
+                        } else {
+                    $output = $query->fetchAll();
+                    }
+                }
+                break;
             case 'levelid':
                 if(empty($param1)) {
                     $output = "ERROR 1: Parameters are empty";
@@ -39,7 +148,7 @@ class nanoLib {
                     } else {
                     $query = $db->prepare("SELECT levelName FROM levels WHERE levelID = $param1");
                     $query->execute();
-                    if(!$query->rowCount() ) {
+                    if (!$query->rowCount() ) {
                         $output = "ERROR 2: Not found";
                         } else {
                     $output = $query->fetchColumn();
@@ -289,9 +398,9 @@ class nanoLib {
             switch($type) {
                 case 'star':
                 case 'starrate':
-                break;
                 $query = $db->prepare("UPDATE levels SET starFeatured = 0, starEpic = 0 WHERE levelID = :levelID");
             $query->execute([':levelID' => $levelID]);
+                break;
                 case 'featured':
                 case 'feature':
                 $query = $db->prepare("UPDATE levels SET starFeatured = 1 WHERE levelID = :levelID");
@@ -311,7 +420,7 @@ class nanoLib {
     return $output;
     }
     
-    public function EXISTS($type, $param1, $param2 = "") {
+    public function EXISTS($type, $param1, $param2 = "true") {
         require "../incl/lib/connection.php";
         require "../incl/lib/mainLib.php";
         $gs = new mainLib();
@@ -330,7 +439,7 @@ class nanoLib {
             if($query->rowCount() > 0) {
                 $output = "true";
                 $b = $query->fetchColumn();
-                $output = "$output | <b>Level:</b> $b";
+                if($param2) $output = "$output | <b>Level:</b> $b";
                 } else {
                 $output = "false";
                 }
@@ -346,6 +455,20 @@ class nanoLib {
                 $output = "true";
                 $b = base64_decode($query->fetchColumn());
                 $output = "$output | <b>Comment:</b> $b";
+                } else {
+                $output = "false";
+                }
+            }
+             case 'account':
+            if(!is_numeric($param1)) {
+            $output = "ERROR 3: Invalid user input";
+            } else {
+            $query = $db->prepare("SELECT userName FROM accounts WHERE accountID = :accountID");
+            $query->execute([':accountID' => $param1]);
+            if($query->rowCount() > 0) {
+                $output = "true";
+                $b = $query->fetchColumn();
+                $output = "$output | <b>Account:</b> $b";
                 } else {
                 $output = "false";
                 }
@@ -379,6 +502,15 @@ class nanoLib {
                     $query->execute([':commentID' => $param]);
                     $output = "Operation done";
                 }
+
+             case 'account':
+                if(!is_numeric($param)) {
+                    $output = "ERROR 3: Invalid user input";
+                } else {
+                    $query = $db->prepare("DELETE FROM accounts WHERE accountID = :accountID");
+                    $query->execute([':accountID' => $param]);
+                    $output = "Operation done";
+                }
         }
     return $output;
     }
@@ -396,10 +528,145 @@ if($onlyDisplayLevelID === 1) {
 $output = 'Level: '.$result['levelName'].' | Level ID: '.$result['levelID'].'';
 }
             break;
+            case "comment":
+                $query = $db->prepare("SELECT * FROM comments ORDER BY RAND() LIMIT 1");
+                $query->execute();
+                $result = $query->fetch();
+if($onlyDisplayLevelID === 1) {
+    $output = $result['commentID'];
+} else {
+$comment = base64_decode($result['comment']);
+$output = 'Comment: '.$comment.' | Commented By: '.$result["userName"].' | Comment ID: '.$result['commentID'].'';
+}
+            break;
+             case "user":
+                $query = $db->prepare("SELECT * FROM users ORDER BY RAND() LIMIT 1");
+                $query->execute();
+                $result = $query->fetch();
+if($onlyDisplayLevelID === 1) {
+    $output = $result['userID'];
+} else {
+$userID = $result['userID'];
+$output = 'UserID: '.$userID.' | User Name: '.$result["userName"].'';
+}
+            break;
             default:
             $output = "ERROR 4: Type is invalid";
         }
     return $output;
     }
+    public function LOGIN($username, $password) {
+        require "../incl/lib/connection.php";
+        require "../incl/lib/mainLib.php";
+        $gs = new mainLib();
+        $username = strtolower($username);
+
+        $queryc = $db->prepare("SELECT * FROM accounts WHERE LOWER(userName) = :username");
+        $queryc->execute([':username' => $username]);
+        if($queryc->rowCount() === 0) {
+            $output = "ERROR 2: Account not found.";
+            } elseif(empty($username) || empty($password)) {
+            $output = "ERROR 1: Parameters are empty";
+            } else {
+        $querys = $db->prepare("SELECT accountID, isAdmin FROM accounts WHERE LOWER(userName) = :username");
+        $querys->execute([':username' => $username]);   
+        $result = $querys->fetch();
+        $accountID = $result['accountID'];
+        $isAdmin = $result['isAdmin'];
+         $querys = $db->prepare("SELECT password FROM accounts WHERE accountID = :id");
+         $querys->execute([':id' => $accountID]);
+        $verifypassword = $querys->fetchColumn();
+        if(empty($verifypassword)) $output = "ERROR: Unknown error";
+        else {
+            
+        $verified = password_verify($password, $verifypassword);
+
+            if($verified) {
+                switch($isAdmin) {
+                    case 1:
+                        $output = "Logged in as admin! | Account ID: $accountID | Username: $username";
+                        $_SESSION['isAdmin'] = true;
+                    break;
+                    default:
+                        $output = "ERROR 8: Not an admin account.";
+                    }
+                } else {
+                $output = "ERROR 7: Wrong password.";
+                }
+            }
+        }
+            return $output;
+    }
+
+    public function LOGOFF() {
+        if(!empty($_SESSION['isAdmin'])) { 
+            $_SESSION['logoffQuestion'] = true;
+        return "Are you sure you want to logoff? y/n"; }
+        else return "ERROR 9: Not logged in";
+        
+    }
+
+    public function y() {
+        if($_SESSION['logoffQuestion']) {
+            $_SESSION['isAdmin'] = null; 
+            $_SESSION['logoffQuestion'] = null;
+            return "Logged off!";
+        } 
+        else {
+            $_SESSION['logoffQuestion'] = null;
+            return;
+        } 
+    }
+
+    public function n() {
+
+        if($_SESSION['logoffQuestion']) {$_SESSION['logoffQuestion'] = false;return "Cancelled";}
+        else {$_SESSION['logoffQuestion'] = false;return;}
+    }
+
+    public function NEW($what, $param1, $param2, $param3, $param4, $param5, $param6 = null) {
+    require "../incl/lib/connection.php";
+    require "../incl/lib/mainLib.php";
+    $gs = new mainLib();
+        switch($what) {
+            case 'mappack':
+            case 'mapack':
+                $levelarray = explode(',', $param1);
+                foreach($levelarray as $level) {
+                    $level = trim($level);
+                    $query = $db->prepare("SELECT * FROM levels WHERE levelID = :levelID");
+                    $query->execute([':levelID' => $level]);
+
+                    if(!$query->rowCount()) {
+                        $output = "ERROR 2: Not found";
+                        return $output;
+                    }
+                }
+                $levelarray = implode(",", $levelarray);
+
+                $rgb = explode(",", $param2);
+
+                foreach($rgb as $color) {
+                    $color = trim($color);
+                }
+
+                if(!$this->rgb_valid($rgb[0], $rbg[1], $rgb[2])) {
+                    $output = "ERROR 3: Invalid user input";
+                    return $output;
+                }
+
+                 $rgb = implode(",", $rgb);
+
+                 $query = $db->prepare("INSERT INTO mappacks(name, levels, stars, coins, difficulty, rgbcolors, colors2, timestamp) VALUES (:name, :levels, :stars, :coins, :difficulty, :rgb, :rgb2, :timestamp)");
+                 $query->execute([':name' => $param5 . $param6, ':levels' => $levelarray, ':stars' => $param3, ':coins' => $param4, ':difficulty' => $gs->getDiffFromStars($param3), ':rgb' => $rgb, ':rgb2' => $rgb, ':timestamp' => time()]);
+                
+                 $output = "Inserted into mappacks";
+            break;
+            default:
+            $output = "ERROR 3: Invalid user input";
+        }
+        return $output;
+    }
+
 }
 ?>

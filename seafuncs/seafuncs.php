@@ -1,10 +1,10 @@
 <?php session_start();?>
 <!DOCTYPE html>
-<header>
+<head>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet">
-</header>
+</head>
 <style>
 body {
     background-image: url("./assets/background.png");
@@ -32,7 +32,7 @@ body {
 .message .pre,
 .message .text {
   border: 0;
-  overflow: scroll;
+  overflow-y: scroll;
   overflow-x: hidden;
   font: inherit;
   padding: 10px;
@@ -104,6 +104,7 @@ body {
   font-style: normal;
   overflow-wrap: break-word;
   overflow: auto;
+  cursor: move;
     }
     
 .output2 {
@@ -112,28 +113,35 @@ body {
     overflow: auto;
     }
 <?php
-include "settings/config.php";
+require "settings/config.php";
 if($colorCoding === 1) {
 echo '
 .get {
 font-family: font-family: "Cascadia Code", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
-color: #faf68e;
+color: #ccf;
 }
 
 .color2 {
 font-family: font-family: "Cascadia Code", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
-color: #958efaff;
+color: #ffffff;
+}
+
+.join {
+font-family: font-family: "Cascadia Code", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+color: #ccf;
 }
 
 .number {
 font-family: font-family: "Cascadia Code", sans-serif;
 font-optical-sizing: auto;
 font-style: normal;
-color: #55ddff;
+color: #fff;
 }';
 } elseif($colorCoding === 2) {
 echo '
@@ -274,8 +282,83 @@ font-style: normal;
   border-style: solid;
   border-color: #ffffff;
 }
+
+.x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background-color: #222;
+  border-width: 2px;
+  border-radius: 5px;
+  border-color: #444;
+  border-style: solid;
+  color: white;
+
+}
+
+@keyframes fadeIn {
+  from { background-color: #222;
+    border-color: #444; }
+  to { background-color: #444;
+    border-color: #666;}
+}
+
+@keyframes fadeOut {
+  from { background-color: #444;
+  border-color: #666; }
+  to { background-color: #222;
+    border-color: #444; }
+}
+
+.button:hover {
+  animation: fadeIn 0.5s forwards;
+}
+
+.button:not(:hover) {
+  animation: fadeOut 0.5s forwards;
+}
+
+.x:hover {
+  animation: fadeIn 0.5s forwards;
+}
+
+.x:not(:hover) {
+  animation: fadeOut 0.5s forwards;
+}
+
 </style>
 <body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 // remove this code if you're arent using 5v.pl
                         (function() {
@@ -396,7 +479,6 @@ font-style: normal;
                             
                         })();
                 </script>
-</body>
 <form action="seafuncs.php" method="post">
 <div class="message">
   <div class="pre"></div>
@@ -404,7 +486,7 @@ font-style: normal;
 </div>
 <br>
 <input id="submit" class="button" type="submit" value="Submit" /><br><br></form>
-
+</body>
 <script>
 
 const button = document.getElementById('submit');
@@ -413,7 +495,8 @@ button.addEventListener('click', function() {
 const e = document.querySelector(".text");
 
 const text = e.innerHTML;
-document.cookie = "text=" + text + "; expires=Thu, 18 Dec 2025 12:00:00 UTC; path=/";
+let newmessage = message.split('\n').join('\\');
+document.cookie = "text=" + newmessage + "; expires=Thu, 18 Dec 2025 12:00:00 UTC; path=/";
 console.log(text);
 });
 
@@ -429,12 +512,13 @@ var mapObj = {
    9:"<span class='number'>9</span>",
    0:"<span class='number'>0</span>",
    GET:"<span class='get'>GET</span>",
-   JOIN:"<span class='get'>JOIN</span>",
+   JOIN:"<span class='join'>JOIN</span>",
    UPDATE:"<span class='get'>UPDATE</span>",
    RATE:"<span class='get'>RATE</span>",
    EXISTS:"<span class='get'>EXISTS</span>",
    DELETE:"<span class='get'>DELETE</span>",
-   DOWNLOAD:"<span class='get'>DOWNLOAD</span>",
+   LOGIN:"<span class='get'>LOGIN</span>",
+   LOGOFF:"<span class='get'>LOGOFF</span>",
    AS:"<span class='get'>AS</span>",
    RAND:"<span class='get'>RAND</span>",
    levelid:"<span class='color2'>levelid</span>",
@@ -459,7 +543,7 @@ var mapObj = {
    data:"<span class='color2'>data</span>"
 };
 
-var re = new RegExp(Object.keys(mapObj).join("|"),"gi"); 
+var re = new RegExp(Object.keys(mapObj).join("|")); 
 
 const colorMention = (elText, elPre) => {
   elPre.innerHTML = elText.innerHTML.replace(re, function(matched){
@@ -481,7 +565,9 @@ const handleKey = (ev, elText, elPre) => {
     }
 
     console.log(message);
-    document.cookie = "text=" + message + "; expires=Thu, 18 Dec 2025 12:00:00 UTC; path=/";
+    let newmessage = message.split('\n').join('\\');
+    console.log(newmessage);
+    document.cookie = "text=" + newmessage + "; expires=Thu, 18 Dec 2025 12:00:00 UTC; path=/";
     window.location.href = "seafuncs.php";
 
     elText.innerHTML = "";
@@ -520,6 +606,8 @@ let hex;
 let xposition;
 let yposition;
 let includes;
+const isOnMobile = navigator.userAgentData && navigator.userAgentData.mobile;
+
 
 function isValidHexColor(colorString) {
   const hexColorRegex = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
@@ -540,10 +628,12 @@ let myStupidArray =
     'RATE',
     'EXISTS',
     'DELETE',
-    'DOWNLOAD',
+    'LOGIN',
     'GET level',
     'GET account',
-    'GET comment'
+    'GET comment',
+    'RAND',
+    'LOGOFF',
   ];
 
 let includeArray = [
@@ -553,7 +643,7 @@ let includeArray = [
 
 // i suck at javascript dont mind this :3
 includes = includeArray.some(element => b.includes(element));
-if(element && !myStupidArray.includes(b) && !includes) {
+if(element && !myStupidArray.includes(b) && !includes && !isOnMobile) {
 document.body.removeChild(getDiv);
 paused = false;
 function sleep(ms) {
@@ -568,7 +658,7 @@ function sleep(ms) {
 if(paused === true) {
     return;
     }
-if(myStupidArray.includes(b) || includes) {
+if((myStupidArray.includes(b) || includes) && !isOnMobile) {
 getDiv = document.createElement("div");
 getDiv.style.width = "100px";
 getDiv.style.height = "25px";
@@ -607,8 +697,14 @@ getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p clas
     case 'DELETE':
 getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">DELETE</p>";
     break;
-     case 'DOWNLOAD':
-getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">DOWNLOAD</p>";
+     case 'LOGIN':
+getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">LOGIN</p>";
+    break;
+     case 'LOGOFF':
+getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">LOGOFF</p>";
+    break;
+     case 'RAND':
+getDiv.innerHTML = "<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px;color:#57bcfa\">RAND</p>";
     break;
      case 'GET user':
 getDiv.innerHTML = "<div class=\"options\"><div class=\"option1\" id=\"option1\"><img src=\"./assets/object.png\" class=\"img2\"><p class=\"p2\"><span style=\"color:#57bcfa\">user</span>name</p></div><div class=\"option2\" id=\"option2\"><img src=\"./assets/object.png\" class=\"img2\" style=\"position: relative;right: 30px\"><p class=\"p2\"><span style=\"color:#57bcfa\">user</span>id</p></div></div>";
@@ -841,21 +937,90 @@ if(event.key === "Tab") {
   wait();
 }
 });
+
+let clicktype = 0;
     
 </script>
 
-<?php
-require __DIR__ . "/lib/nanoLib.php";
-require "../incl/lib/connection.php";
-$nl = new nanoLib();
-if(!empty($_COOKIE['text'])) {
-    try {
-$result = explode(" ", $_COOKIE['text']);
 
-if(count($result) > 2 && str_contains($_COOKIE['text'], 'GET') && $result[2] !== 'JOIN') {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+if($reportErrors) error_reporting(E_ALL); else error_reporting(0);
+if(file_exists('./lib/nanoLib.php')) {
+    require "./lib/nanoLib.php";
+} else {
+    die('File <b>nanoLib.php<b> not found. Please reinstall seafuncs.');
+}
+
+if($needsAdmin && $_SESSION['isAdmin'] != true && !str_contains($_COOKIE['text'], 'LOGIN') && !str_contains($_COOKIE['text'], 'LOGOFF')) {
+  $output = "ERROR 6: Not enough perms. Login typing <b>LOGIN (username) (password)</b>.";
+    echo '<div class="output" id="output">
+
+<p><b>Output:</b></p><p class="output2"> '.$output.'</p><br>
+</div>
+';
+exit();
+}
+require "../incl/lib/connection.php";
+$outputs = [];
+$text = $_COOKIE['text'] ?? '';
+
+$text = str_replace("<br>", PHP_EOL, $text);
+$text = str_replace("&nbsp;", " ", $text);
+$text = strip_tags($text);
+$text = trim($text);
+if(!empty($text)) {
+  $nl = new nanoLib();
+  $output = null;
+    try {
+$lines = explode('\\', $text);
+foreach($lines as $querycode) {
+    
+$result = '';
+$lastIndex = '';
+$output = '';
+
+$result = explode(" ", $querycode);
+
+if(count($result) > 2 && str_contains($querycode, 'GET') && $result[2] !== 'JOIN' && $result[1] !== 'levels') {
 $x = 0;
 foreach($result as $value) {
-if($result[$x] === "AS") break;
+
+  if(count($result) < 3) {
+    $output = "Fatal unknown error";
+    array_push($outputs, $output);
+    continue;
+  }
+if($result[$x] === "AS") continue;
 if ($x < 3) {
     $x++;
     } else {
@@ -866,7 +1031,7 @@ if ($x < 3) {
     }
 }
 
-if($result[2] == 'JOIN' && str_contains($_COOKIE['text'], 'levelid') OR str_contains($_COOKIE['text'], 'comment')) {
+if($result[2] == 'JOIN' && (str_contains($querycode, 'levelid') OR str_contains($querycode, 'comment'))) {
     $x = 0;
 foreach($result as $value) {
 if ($x < 6) {
@@ -881,20 +1046,9 @@ if ($x < 6) {
     $result[5] =  "\"$result[5]\"";
     }
 
-$query = $db->prepare("SELECT isAdmin FROM accounts WHERE accountID = :accountID");
-$query->execute(['accountID' => $_SESSION['accountID']]);
-$isAdmin = $query->fetchColumn();
 
-if(str_contains($_COOKIE['text'], 'UPDATE') OR str_contains($_COOKIE['text'], 'RATE') OR str_contains($_COOKIE['text'], 'DELETE')) {
-  if(!$isAdmin) {
-    $output = "ERROR 6: Not enough perms <a href=\"login.php\">Login</a>";
-   echo '<div class="output">
-<p><b>Output:</b></p><p class="output2"> '.$output.'</p>
-</div>';
-exit();
-  }
-}
-if(str_contains($_COOKIE['text'], 'JOIN')) {
+
+if(str_contains($querycode, 'JOIN')) {
     $result = implode(" ", $result);
     $oldresult = strstr($result, "JOIN");
     $result = strstr($result, "JOIN", true);
@@ -908,57 +1062,185 @@ eval('$oldoutput = $nl->'.$oldresult[0].'('.$oldresult[1].', '.$oldresult[2].');
 array_push($result, $oldoutput);
 }
 
-$result[1] = "\"$result[1]\"";
-if(!is_numeric($result[2]) && !empty($result[2])) $result[2] = "\"$result[2]\"";
-$result = array_filter($result);
-
-switch(count($result)) {
-    case 2:
-eval('$output = $nl->'.$result[0].'('.$result[1].');');
-break;
-    case 3:
-eval('$output = $nl->'.$result[0].'('.$result[1].', '.$result[2].');');
-break;
-      default:
-eval('$output = $nl->'.$result[0].'('.$result[1].', '.$result[2].');');
+$code = '$output = $nl->';
+foreach($result as $key) {
+  if(!is_numeric($key) && !empty($key) && $y != 0) $key = "\"$key\"";
+if($y == 0) {
+  $code .= $key.'(';
+  } elseif($y == count($result)-1) {
+  $code .= $key;
+  } else {
+  $code .= $key . ', ';
+  }
+  $y++;
+  $result = array_values(array_filter($result));
 }
+$code .= ');';
 
-if(str_contains($_COOKIE['text'], "AS")) {
-  if(empty($output)) $output = "ERROR 5: Function could not be found or there was no output.";
-    else {
-    $lastIndex = end(explode(" ", $_COOKIE['text']));
-    $query = $db->prepare("REPLACE INTO seafuncvars SET
+eval($code);
+
+if(str_contains($querycode, "AS")) {
+  if(empty($output) || !$lastIndex) {
+      $output = "ERROR 5: Function could not be found or there was no output.";
+    } else {
+    $lastIndex = end($result);
+    $querye = $db->prepare("INSERT INTO seafuncvars SET
     varName = :lastIndex, 
     varValue = :output");
-    $query->execute([':lastIndex' => $lastIndex, ':output' => $output]);
+    $querye->execute([':lastIndex' => $lastIndex, ':output' => $output]);
     $output = "inserted into database, $output";
     }
   }
-
+  array_push($outputs, $output);
+}
 } catch(Exception $e) {
-$output = $e;
+ array_push($outputs, $e->getMessage());
 } finally {
-if(empty($output) OR !isset($output)) $output = "ERROR 5: Function could not be found or there was no output.";
-// if(empty($result[0]) OR empty($result[1])) $output = "ERROR 1: No sufficient parameters were given.";
-if(is_array($output)) {
-  echo '
-<div class="output">
-<p><b>Output:</b></p><p>';
-print_r($output);
-echo '</p>
-</div>';
-} elseif(str_contains($output, 'ERROR') OR str_contains($output, 'PDO')) {
-echo '
-<div class="output">
-<p><b>Output:</b></p><p class="output2"> '.$output.'</p>
-</div>';
-} else {
-echo '<div class="output">
-<p><b>Output: </b>'.$output.'</p>
-</div>';
-}
-}
-}
+  $x = 0;
+  echo '<div class="output" id="output">';
+foreach($outputs as $output) {
+    if(empty($output) OR !isset($output)) $output = "ERROR 5: Function could not be found or there was no output.";
+    $x++;
+    if(is_array($output)) {
+      $e = $output; $output = null; $z = 0;
+      foreach($e as $array) {
+        if(is_array($array)) {
+          $z++;
+          $suboutput = "";
+          $d = 0; // i just fucking gave up with variable names bruh
+          foreach($array as $name => $value) {
+            $d++;
+            if(empty($value)) continue;
+            if($d < count($array) && $d != 1) {
+            $suboutput .= "$name: $value, ";
+            } elseif($d == 1) $suboutput .= '<p style="text-align:center">Array<button onclick="
+            var array'.$z.' = document.getElementById(\'array'.$z.'\');
+            var button'.$z.' = document.getElementById(\'button'.$z.'\');
+            
+            if(clicktype == 0) {
+            array'.$z.'.style.opacity = 1;
+            button'.$z.'.innerHTML = \'-\';
+            clicktype = 1;
+          } else {
+            array'.$z.'.style.opacity = 0;
+            button'.$z.'.innerHTML = \'+\';
+            clicktype = 0;
+          }
+            console.log(\'type = \' + clicktype);"  id="button'.$z.'">+</button><span id="array'.$z.'" style="opacity:0"> [' .$name.': '.$value.'';
+            else $suboutput .= "$name: $value]</span></p>";
+          }
+          $output .=  "<b>". $z . ".</b> $suboutput <br>";
+        } else {
+        $z++;
+        $output .=  $z . ". $array[0] <br>";
+      }
+    }
+        echo '
+<p><b>Output n°'.$x.':</b></p><p>';
+        print_r($output);
+        echo '</p><br>
+';
+    } elseif(str_contains($output, 'ERROR') OR str_contains($output, 'PDO')) {
+        echo '
 
-unset($_COOKIE['text']);
+<p><b>Output n°'.$x.':</b></p><p class="output2"> '.$output.'</p><br>
+';
+    } else {
+        echo '
+<p><b>Output n°'.$x.': </b>'.$output.'</p><br>
+';
+    }
+}
+}
+} else echo 'An error occurred, please try again.';
+
+echo '<button id="remove" class="x">X</button>';
+echo '</div>';
+
+setcookie('text', '', time() - 3600, '/');
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const x = document.querySelector('.x');
+x.addEventListener('click', function() {
+  const outputDiv = document.querySelector('.output');
+  outputDiv.remove();
+});
+document.addEventListener('keydown', function(event) {
+if(event.key === "Escape") {
+  const outputDiv2 = document.querySelector('.output');
+  outputDiv2.remove();
+}
+});
+
+dragElement(document.getElementById("output"));
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+

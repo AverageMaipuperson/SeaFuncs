@@ -1,0 +1,266 @@
+body {
+    background-image: url("../assets/background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: "Cascadia Code", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+    }
+    
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.message {
+  display: block;
+  position: relative;
+  width: 100%;
+  background-color: #222222;
+  color: white;
+}
+
+.message .pre,
+.message .text {
+  border: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  font: inherit;
+  padding: 10px;
+  height: 5rem;
+  resize: none;
+  width: 100%;
+  white-space: break-spaces;
+  word-wrap: break-word;
+}
+
+
+/* The overlay contenteditable with transparent text but visible caret */
+
+.message .text {
+  position: relative;
+  background: transparent;
+  outline: none;
+  /* transparent color */
+  color: transparent;
+  /* but visible caret */
+  caret-color: white;
+}
+
+
+/* The underlaying element with colors */
+
+.message .pre {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* Prevent text selections */
+  user-select: none;
+}
+    
+.button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    background-color: #222222;
+    padding: 10px;
+    color: white;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #444444;
+    border-radius: 10px;
+    font-family: "Cascadia Code", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+    cursor: pointer;
+    }
+
+.output {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    background-color: #e0e0e0;
+    padding: 50px;
+    border-style: double;
+    white-space: nowrap;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    font-family: "Cascadia Code", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  overflow-wrap: break-word;
+  overflow: auto;
+  cursor: move;
+    }
+    
+.output2 {
+    color: red;
+    overflow-wrap: break-word;
+    overflow: auto;
+    }
+
+.getDiv {
+    padding: 20px;
+    }
+
+.h1Get {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    margin-left: 10px;
+    }
+
+
+
+.p2 {
+    font-size: 11px; 
+    }
+    
+.img {
+    height: 30px;
+    float: left;
+    }
+  
+.img2 {
+    height: 30px;
+    float: left;
+    }
+
+.img3 {
+    height: 30px;
+    float: left;
+    }
+
+.options {
+    background-color: #222222; 
+    height: 50px;
+    width: 100px;
+    border-width: 1px; 
+    border-style: solid;
+    border-color: #555555;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .options2 {
+    background-color: #222222; 
+    height: 75px;
+    width: 100px;
+    border-width: 1px; 
+    border-style: solid;
+    border-color: #555555;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+.option1 {
+    background-color: #054499; 
+    height: 50%;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+  }
+.option2 {
+    background-color: #222;
+    height: 50%;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+  }
+
+.option1b {
+    background-color: #054499; 
+    height: 33.3%;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+  }
+.option2b {
+    background-color: #222;
+    height: 33.3%;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+  }
+
+.option3b {
+    background-color: #222;
+    height: 33.3%;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+  }
+
+.colorDiv {
+  height: 20px;
+  width: 20px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #ffffff;
+}
+
+.x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background-color: #222;
+  border-width: 2px;
+  border-radius: 5px;
+  border-color: #444;
+  border-style: solid;
+  color: white;
+
+}
+
+@keyframes fadeInColor {
+  from { background-color: #222;
+    border-color: #444; }
+  to { background-color: #444;
+    border-color: #666;}
+}
+
+@keyframes fadeOutColor {
+  from { background-color: #444;
+  border-color: #666; }
+  to { background-color: #222;
+    border-color: #444; }
+}
+
+.button:hover, .x:hover {
+  animation: fadeInColor 0.5s forwards;
+}
+
+.button:not(:hover), .x:not(:hover) {
+  animation: fadeOutColor 0.5s forwards;
+}
+
+cb {
+    color: #2e74ad;
+}
+
+cy {
+    color: #ffff00;
+}
+
+cc, cct {
+    color: #00ffff
+}
+
+.hover-div {
+    position:relative;
+    z-index: 100;
+    display:inline;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1;}
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity:0;}
+}

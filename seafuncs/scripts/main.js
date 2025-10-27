@@ -118,7 +118,7 @@
                             
                         })();
 
-class animationHandler {
+class AnimationHandler {
 
     runAnimation(elementVar, animationName) {
         elementVar.style.animation = animationName + '0.5s ease';
@@ -131,7 +131,7 @@ class animationHandler {
         return;
     }
 }
-const animation = new animationHandler();
+const animation = new AnimationHandler();
 const button = document.getElementById('submit');
 
 button.addEventListener('click', function() {
@@ -335,7 +335,7 @@ document.getElementById('getDiv').style.opacity = '0';
 readTextFile("../seafuncs/extra/documentation.json", function(value){
     var data = JSON.parse(value);
     var structure = data[firstIndex][0]['structure'];
-    getDiv.innerHTML = `<img src=\"./assets/function.png\" class=\"img\"><br><p class=\"p2\" style=\"position:relative;top:-10px\"><cc>${firstIndex}()</cc> <br> ${structure}</p>`;
+    getDiv.innerHTML = `<img src="./assets/function.png" class="img"><br><p class="p2" style="position:relative;top:-10px"><cc>${firstIndex}()</cc> <br> ${structure}</p>`;
 });
 } 
 document.body.appendChild(getDiv);

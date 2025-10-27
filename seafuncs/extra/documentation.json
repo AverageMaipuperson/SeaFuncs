@@ -1,0 +1,57 @@
+{
+"GET": [
+{
+    "creation": "v1.0.0",
+    "desc": "GET is the most important query, letting you obtain useful information like ids, data, seafuncs information and more.",
+    "structure": "GET <cc>type</cc> ...params"
+    }
+    ],
+"UPDATE": [ {
+    "creation": "v1.0.0",
+    "desc": "UPDATE like it's name suggests, updates a value in a table.",
+    "structure": "UPDATE <cc>type</cc> ...params"
+    }
+],
+"RATE": [ {
+    "creation": "v1.1.0",
+    "desc": "RATE rates a level.",
+    "structure": "RATE <cc>levelID</cc> <cy>amount</cy> <cy>type</cy>"
+    }
+],
+"EXISTS": [ {
+    "creation": "v1.1.0",
+    "desc": "EXISTS checks if a value exists, and if so, it will return true.",
+    "structure": "EXISTS <cc>type</cc> ...params"
+    }
+],
+"DOWNLOAD": [ {
+    "creation": "v1.2.0",
+    "desc": "DOWNLOAD downloads a file from your database.",
+    "structure": "DOWNLOAD <cc>fileDirectory</cc>",
+    "deprecated": true
+    } ],
+"DELETE": [ {
+    "creation": "v1.2.0",
+    "desc": "DELETE removes a level, comment or user from the database",
+    "structure": "DELETE <cc>type</cc> param"
+    }
+],
+"JOIN": [ {
+    "creation": "v1.2.0",
+    "desc": "JOIN joins two queries to form one, usually related to GET.",
+    "structure": "...code JOIN code..."
+    }
+],
+"RAND": [ {
+    "creation": "v1.3.0",
+    "desc": "RAND gets a random level, comment or user.",
+    "structure": "RAND <cc>type</cc> onlyDisplayLevelID"
+    }
+],
+"LOGIN": [ {
+    "creation": "v1.4.0",
+    "desc": "LOGIN and LOGOFF like they suggest, are a login system only when you enable that only mods can use SeaFuncs.",
+    "structure": "LOGIN <cc>userName</cc> password"
+    }
+]
+}

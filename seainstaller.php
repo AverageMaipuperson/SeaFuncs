@@ -47,6 +47,9 @@ $folder_array = [
     'lib',
     'settings',
     'assets',
+    'extra',
+    'scripts',
+    'styles',
 ];
 
 foreach($folder_array as $folder) {
@@ -54,12 +57,15 @@ foreach($folder_array as $folder) {
 }
 
 $files_array = [
-'seafuncs.php',
+'index.php',
 'lib/nanoLib.php',
 'settings/config.php',
 'assets/background.png',
 'assets/function.png',
-'assets/object.png'
+'assets/object.png',
+'extra/documentation.json',
+'scripts/main.js',
+'styles/seafuncs.css'
 ];
 
 foreach($files_array as $file) {

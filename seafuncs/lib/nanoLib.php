@@ -114,7 +114,6 @@ class nanoLib {
                 }
                 
                 $f = "SELECT $data FROM levels WHERE $condition";
-                echo $f;
                     $query = $db->prepare($f);
                     $query->execute();
                     if($query->rowCount() == 0) {

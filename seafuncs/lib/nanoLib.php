@@ -1,8 +1,7 @@
-<?php session_start();?>
-<?php
+<?php session_start();
 class nanoLib {
 
-    public function rgb_valid(int $red, int $green, int $blue): bool
+    private function rgb_valid(int $red, int $green, int $blue): bool
 {
     if ($red < 0 || $red > 255) {
         return false;
@@ -18,7 +17,7 @@ class nanoLib {
 
     return true;
 }
-    public function checkthenlower($var) {
+    private function checkthenlower($var) {
             if(!is_numeric($var)) $e = strtolower($var);
             return $e;
             }
@@ -281,9 +280,8 @@ class nanoLib {
                     if(empty($param1)) {
                     $output = "ERROR 1: Parameters are empty";
                 } else {
-                    $dbh = "SELECT * FROM $param1";
-                    $query = $db->prepare($dbh);
-                    $query->execute();
+                    $query = $db->prepare("SELECT * FROM :param1");
+                    $query->execute([':param1' => $param1]);
                     $output = $query->fetchAll();
                     }
                 break;

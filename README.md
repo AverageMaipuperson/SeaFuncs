@@ -1,7 +1,7 @@
 # SEAFUNCS
 
 ## SeaFuncs is a very simple query system similar to SQL made for GDPSES, if you struggle with SQL this might be easier to use for you!
-- Able to get data, update data, delete data, save variables on the database, and more!
+- Able to get data, update data, delete data, create data and more!
 
 # Installation
 1. Go to the **latest release** and download seainstaller.php.
